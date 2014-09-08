@@ -42,7 +42,9 @@ public class AppTest
 				(SSLSocketFactory)SSLSocketFactory.getDefault();
 
 			SSLSocket s = (SSLSocket)sslFact.createSocket("localhost", port);
-			s.setEnabledCipherSuites(sslFact.getSupportedCipherSuites());
+			s.setEnabledCipherSuites(
+					getDHCiphers(
+						sslFact.getSupportedCipherSuites()));
 			in = s.getInputStream();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] buffer = new byte[1024];
@@ -58,5 +60,15 @@ public class AppTest
 		} finally {
 			if (in!=null) { in.close(); }
 		}
+	}
+
+	private String[] getDHCiphers(String[] availableCipherSuites) {
+		java.util.List<String> ret = new java.util.ArrayList<String>();
+		for( String cipherSuite: availableCipherSuites ) {
+			if (cipherSuite.contains("") ) {
+				ret.add(cipherSuite);
+			}
+		}
+		return ret.toArray(new String[0]);
 	}
 }
