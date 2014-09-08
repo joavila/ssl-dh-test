@@ -34,41 +34,9 @@ public class AppTest
 	public void testApp() throws Exception
 	{
 		final int port = 9095;
-		InputStream in = null;
-		try {
-			new Thread(new App(port)).start();
-			System.out.println("Starting client...");
-			SSLSocketFactory sslFact =
-				(SSLSocketFactory)SSLSocketFactory.getDefault();
-
-			SSLSocket s = (SSLSocket)sslFact.createSocket("localhost", port);
-			s.setEnabledCipherSuites(
-					getDHCiphers(
-						sslFact.getSupportedCipherSuites()));
-			in = s.getInputStream();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			byte[] buffer = new byte[1024];
-			int length = 0;
-
-			while ((length = in.read(buffer)) != -1) {
-				baos.write(buffer, 0, length);
-			}
-			assertEquals( 
-					App.MESSAGE, 
-					new String(baos.toByteArray(), App.CHARSET)
-				    );
-		} finally {
-			if (in!=null) { in.close(); }
-		}
+		new Thread(new App(port)).start();
+		assertEquals( App.MESSAGE, new Client(port).hit("localhost") );
 	}
 
-	private String[] getDHCiphers(String[] availableCipherSuites) {
-		java.util.List<String> ret = new java.util.ArrayList<String>();
-		for( String cipherSuite: availableCipherSuites ) {
-			if (cipherSuite.contains("") ) {
-				ret.add(cipherSuite);
-			}
-		}
-		return ret.toArray(new String[0]);
-	}
+
 }
