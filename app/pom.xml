@@ -26,7 +26,18 @@
 					<systemPropertyVariables>
 						<javax.net.debug>all</javax.net.debug>
 						<ssl.debug>true</ssl.debug>
-						<!--javax.net.ssl.trustStore>\SRs\3-8751802509\attachments\DemoTrust.jks</javax.net.ssl.trustStore-->
+						<javax.net.ssl.trustStore>
+							cacerts.jks
+						</javax.net.ssl.trustStore>
+						<javax.net.ssl.trustStorePassword>
+							changeit 
+						</javax.net.ssl.trustStorePassword>
+						<javax.net.ssl.keyStore>
+							keystore.jks
+						</javax.net.ssl.keyStore>
+						<javax.net.ssl.keyStorePassword>
+							changeit
+						</javax.net.ssl.keyStorePassword>
 					</systemPropertyVariables>
 				</configuration>
 			</plugin>
