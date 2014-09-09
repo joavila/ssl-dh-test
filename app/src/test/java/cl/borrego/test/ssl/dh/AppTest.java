@@ -35,7 +35,10 @@ public class AppTest
 	{
 		final int port = 9095;
 		new Thread(new App(port)).start();
-		assertEquals( App.MESSAGE, new Client(port).hit("localhost") );
+		java.util.List<String> results = new Client(port).hit("localhost");
+		for ( String result: results ) {
+			assertEquals( App.MESSAGE, result );
+		}
 	}
 
 

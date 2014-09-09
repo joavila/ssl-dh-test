@@ -24,39 +24,34 @@ public class Client implements Runnable
 		}
 	}
 	
-	public String hit(String host) throws Exception {
-		InputStream in = null;
-		try {
-			System.err.println("Starting client...");
-			SSLSocketFactory sslFact =
-				(SSLSocketFactory)SSLSocketFactory.getDefault();
-			System.err.println(String.format("Trying to hit {%s,%d}", host, port));
-			SSLSocket s = (SSLSocket)sslFact.createSocket(host, port);
-			s.setEnabledCipherSuites(
-					getDHCiphers(
-						sslFact.getSupportedCipherSuites(), "### %s"));
-			in = s.getInputStream();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			byte[] buffer = new byte[1024];
-			int length = 0;
+	public java.util.List<String> hit(String host) throws Exception {
+		System.err.println("Starting client...");
+		SSLSocketFactory sslFact = (SSLSocketFactory)SSLSocketFactory.getDefault();
+		java.util.List <String> ret = new java.util.ArrayList<String> ();
+		for (String cipherSuite: sslFact.getSupportedCipherSuites() ) {
+			InputStream in = null;
+			try {
+				System.err.println(String.format("Trying to hit {%s,%d} using {%s}.", host, port, cipherSuite));
+				SSLSocket s = (SSLSocket)sslFact.createSocket(host, port);
+				s.setEnabledCipherSuites(new String [] {cipherSuite} );
+				in = s.getInputStream();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				byte[] buffer = new byte[1024];
+				int length = 0;
 
-			while ((length = in.read(buffer)) != -1) {
-				baos.write(buffer, 0, length);
+				while ((length = in.read(buffer)) != -1) {
+					baos.write(buffer, 0, length);
+				}
+				
+				ret.add ( new String(baos.toByteArray(), App.CHARSET) );
+				System.err.println(String.format("Successfully hit {%s,%d} using {%s}.", host, port, cipherSuite));
+			} catch (SSLHandshakeException e) {
+				e.printStackTrace();
+			} finally {
+				if (in!=null) { in.close(); }
 			}
-			return new String(baos.toByteArray(), App.CHARSET);
-		} finally {
-			if (in!=null) { in.close(); }
+			
 		}
-	}
-	
-	protected static String[] getDHCiphers(String[] availableCipherSuites, final String format) {
-		java.util.List<String> ret = new java.util.ArrayList<String>();
-		for( String cipherSuite: availableCipherSuites ) {
-			if (cipherSuite.contains("DHE") ) {
-				System.err.println(String.format(format, cipherSuite));
-				ret.add(cipherSuite);
-			}
-		}
-		return ret.toArray(new String[0]);
+		return ret;
 	}
 }

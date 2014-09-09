@@ -25,23 +25,24 @@ public class App implements Runnable
 			SSLServerSocketFactory sslSrvFact =
 				(SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
 			s = (SSLServerSocket)sslSrvFact.createServerSocket(port);
-			final String[] cipherSuites = Client.getDHCiphers(
-				sslSrvFact.getSupportedCipherSuites(), "@@@ %s");
-			/*for(String cs: cipherSuites) {
-				System.err.println("*** " + cs);
-			}//*/
+			final String[] cipherSuites = sslSrvFact.getSupportedCipherSuites();
 			s.setEnabledCipherSuites(
 					cipherSuites
 					);
 
 			System.err.println(String.format("Server listening in port {%d}...", port));
-			SSLSocket c = (SSLSocket)s.accept();
-			OutputStream out = null;
-			try {
-				out = c.getOutputStream();
-				out.write(MESSAGE.getBytes(CHARSET));
-			} finally {
-				if (out != null) { out.close(); }
+			for(;;) {
+				SSLSocket c = (SSLSocket)s.accept();
+				OutputStream out = null;
+				try {
+					out = c.getOutputStream();
+					out.write(MESSAGE.getBytes(CHARSET));
+					System.err.println("Sent welcome message");
+				} catch(SSLHandshakeException e) {
+					e.printStackTrace();
+				} finally {
+					if (out != null) { out.close(); }
+				}
 			}
 		} catch ( IOException e ) {
 			e.printStackTrace();
