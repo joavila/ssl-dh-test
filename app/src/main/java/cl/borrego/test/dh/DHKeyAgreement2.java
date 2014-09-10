@@ -109,7 +109,7 @@ public class DHKeyAgreement2 {
         System.out.println("ALICE: Generate DH keypair ...");
         KeyPairGenerator aliceKpairGen = KeyPairGenerator.getInstance("DH");
         aliceKpairGen.initialize(dhSkipParamSpec);
-        KeyPair aliceKpair = aliceKpairGen.generateKeyPair();
+        final KeyPair aliceKpair = aliceKpairGen.generateKeyPair();
 
         // Alice creates and initializes her DH KeyAgreement object
         System.out.println("ALICE: Initialization ...");
@@ -118,6 +118,26 @@ public class DHKeyAgreement2 {
 
         // Alice encodes her public key, and sends it over to Bob.
         byte[] alicePubKeyEnc = aliceKpair.getPublic().getEncoded();
+		
+		{
+			PublicKey aPublicKey = new PublicKey () {
+				public byte[] getEncoded() {
+					java.util.Random random = new java.util.Random(3);
+					byte [] ret = new byte[random.nextInt(20)];
+					random.nextBytes(ret);
+					return ret;
+				}
+				
+				public String getFormat() {
+					return aliceKpair.getPublic().getFormat();
+				}
+				
+				public String getAlgorithm() {
+					return aliceKpair.getPublic().getAlgorithm();
+				}
+			};
+			alicePubKeyEnc = aPublicKey.getEncoded();
+		}
 
         /*
          * Let's turn over to Bob. Bob has received Alice's public key
